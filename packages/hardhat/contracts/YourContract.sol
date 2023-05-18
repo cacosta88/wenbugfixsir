@@ -154,32 +154,27 @@ contract YourContract is AccessControl, ReentrancyGuard {
         }
     }
 
-    // Update a creator's flow cap and cycle.
-    function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap, uint256 _newCycle) public onlyAdmin isFlowActive(_creator) {
-        if (_newCap == 0) revert CapCannotBeZero();
-        if (_newCycle == 0) revert CycleCannotBeZero();
+   // Update a creator's flow cap and cycle.
+function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap, uint256 _newCycle) public onlyAdmin isFlowActive(_creator) {
+    if (_newCap == 0) revert CapCannotBeZero();
+    if (_newCycle == 0) revert CycleCannotBeZero();
 
-        CreatorFlowInfo storage creatorFlow = flowingCreators[_creator];
-        uint256 timePassed = block.timestamp - creatorFlow.last;
-        uint256 cycleDuration = creatorFlow.cycle * 1 days;
+    CreatorFlowInfo storage creatorFlow = flowingCreators[_creator];
 
-        // Calculate the used portion of the cap in the current cycle
-        uint256 capUsed = 0;
-        if (timePassed < cycleDuration) {
-            capUsed = (timePassed * creatorFlow.cap) / cycleDuration;
-        }
+    // Set the new cap without calculating the used portion in the current cycle
+    creatorFlow.cap = _newCap;
+    creatorFlow.cycle = _newCycle;
 
-        // Subtract the used portion from the old cap and add it to the new cap
-        creatorFlow.cap = _newCap + capUsed;
-        creatorFlow.cycle = _newCycle;
+    uint256 timePassed = block.timestamp - creatorFlow.last;
 
-        // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
-        if (_newCycle * 1 days < timePassed) {
-            creatorFlow.last = block.timestamp - (_newCycle * 1 days);
-        }
-
-        emit CreatorUpdated(_creator, _newCap, _newCycle);
+    // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
+    if (_newCycle * 1 days < timePassed) {
+        creatorFlow.last = block.timestamp - (_newCycle * 1 days);
     }
+
+    emit CreatorUpdated(_creator, _newCap, _newCycle);
+}
+
 
     // Remove a creator's flow.
     function removeCreatorFlow(address _creator) public onlyAdmin isFlowActive(_creator) {
