@@ -111,7 +111,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
     }
 
     // Get the available amount for a creator.
-    function availableCreatorAmount(address _creator) internal view isFlowActive(_creator) returns (uint256) {
+    function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
         CreatorFlowInfo memory creatorFlow = flowingCreators[_creator];
         uint256 timePassed = block.timestamp - creatorFlow.last;
         uint256 cycleDuration = creatorFlow.cycle * 1 days;
