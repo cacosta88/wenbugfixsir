@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 //This contract is a work in progress for research and development purposes only.
+//This version is the original uploaded version for reference, for the latest version see YourContract.sol (or the contract being deployed). 
  
 //Pipoca
 
