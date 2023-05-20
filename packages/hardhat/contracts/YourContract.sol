@@ -109,6 +109,22 @@ contract YourContract is AccessControl, ReentrancyGuard {
         }
         return result;
     }
+    
+        // Function to get details of multiple creators
+    function getCreatorDetails(address[] memory _creators) public view returns(uint256[] memory, uint256[] memory, uint256[] memory) {
+        uint256 length = _creators.length;
+        uint256[] memory cycles = new uint256[](length);
+        uint256[] memory caps = new uint256[](length);
+        uint256[] memory availableAmounts = new uint256[](length);
+
+        for(uint256 i = 0; i < length; ++i) {
+            cycles[i] = flowingCreators[_creators[i]].cycle;
+            caps[i] = flowingCreators[_creators[i]].cap;
+            availableAmounts[i] = availableCreatorAmount(_creators[i]);
+        }
+
+        return (cycles, caps, availableAmounts);
+    }
 
     // Get the available amount for a creator.
     function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
