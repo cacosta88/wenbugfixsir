@@ -19,7 +19,6 @@ error CapCannotBeZero();
 error InvalidCreatorAddress();
 error CreatorAlreadyExists();
 error ContractIsStopped();
-error CycleCannotBeZero();
 error MaxCreatorsReached();
 error AccessDenied();
 
@@ -143,53 +142,50 @@ contract YourContract is AccessControl, ReentrancyGuard {
 
 
     // Add a new creator's flow. No more than 25 creators are allowed.
-    function addCreatorFlow(address payable _creator, uint256 _cap, uint256 _cycle) public onlyAdmin {
+    function addCreatorFlow(address payable _creator, uint256 _cap) public onlyAdmin {
         // Check for maximum creators.
         if (activeCreators.length >= 25) revert MaxCreatorsReached();
         
-        validateCreatorInput(_creator, _cap, _cycle);
-        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, _cycle);
+        validateCreatorInput(_creator, _cap);
+        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, 30);
         activeCreators.push(_creator);
         creatorIndex[_creator] = activeCreators.length - 1;
-        emit CreatorAdded(_creator, _cap, _cycle);
+        emit CreatorAdded(_creator, _cap, 30);
     }
 
     // Validate the input for a creator.
-    function validateCreatorInput(address payable _creator, uint256 _cap, uint256 _cycle) internal view {
+    function validateCreatorInput(address payable _creator, uint256 _cap) internal view {
         if (_creator == address(0)) revert InvalidCreatorAddress();
         if (_cap == 0) revert CapCannotBeZero();
-        if (_cycle == 0) revert CycleCannotBeZero();
         if (flowingCreators[_creator].cap > 0) revert CreatorAlreadyExists();
     }
 
     // Add a batch of creators.
-    function addBatch(address[] memory _creators, uint256[] memory _caps, uint256[] memory _cycles) public onlyAdmin {
-        if (_creators.length != _caps.length || _creators.length != _cycles.length) revert LengthsMismatch();
+    function addBatch(address[] memory _creators, uint256[] memory _caps) public onlyAdmin {
+        if (_creators.length != _caps.length) revert LengthsMismatch();
         uint256 cLength = _creators.length;
         for (uint256 i = 0; i < cLength ; ++i) {
-            addCreatorFlow(payable(_creators[i]), _caps[i], _cycles[i]);
+            addCreatorFlow(payable(_creators[i]), _caps[i]);
         }
     }
 
    // Update a creator's flow cap and cycle.
-function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap, uint256 _newCycle) public onlyAdmin isFlowActive(_creator) {
+function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) public onlyAdmin isFlowActive(_creator) {
     if (_newCap == 0) revert CapCannotBeZero();
-    if (_newCycle == 0) revert CycleCannotBeZero();
 
     CreatorFlowInfo storage creatorFlow = flowingCreators[_creator];
 
     // Set the new cap without calculating the used portion in the current cycle
     creatorFlow.cap = _newCap;
-    creatorFlow.cycle = _newCycle;
 
     uint256 timePassed = block.timestamp - creatorFlow.last;
 
     // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
-    if (_newCycle * 1 days < timePassed) {
-        creatorFlow.last = block.timestamp - (_newCycle * 1 days);
+    if (30 days < timePassed) {
+        creatorFlow.last = block.timestamp - (30 days);
     }
 
-    emit CreatorUpdated(_creator, _newCap, _newCycle);
+    emit CreatorUpdated(_creator, _newCap, 30);
 }
 
 
