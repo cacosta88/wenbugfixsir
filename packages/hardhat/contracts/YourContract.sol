@@ -24,7 +24,7 @@ error AccessDenied();
 
 contract YourContract is AccessControl, ReentrancyGuard {
  
-    //Emergency mode variables
+    //Emergency mode variable
     bool public stopped = false;
 
     // Defining admin role for the contract using AccessControl
