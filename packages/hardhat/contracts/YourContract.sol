@@ -224,7 +224,8 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 
         creatorFlow.last = creatorFlow.last + ((block.timestamp - creatorFlow.last) * _amount / totalAmountCanWithdraw);
 
-        if (address(this).balance < _amount) revert InsufficientFundsInContract(_amount, address(this).balance);
+        uint256 contractFunds = address(this).balance;
+        if (contractFunds < _amount) revert InsufficientFundsInContract(_amount, contractFunds);
 
         (bool sent,) = msg.sender.call{value: _amount, gas: 21000}("");
         if (!sent) revert EtherSendingFailed(msg.sender);
