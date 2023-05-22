@@ -23,8 +23,12 @@ error MaxCreatorsReached();
 error AccessDenied();
 
 contract YourContract is AccessControl, ReentrancyGuard {
+
+    // Fixed cycle and max creators
+    uint256 immutable CYCLE = 30 days;
+    uint256 immutable MAXCREATORS = 25;
  
-    //Emergency mode variable
+    // Emergency mode variable
     bool public stopped = false;
 
     // Defining admin role for the contract using AccessControl
@@ -130,7 +134,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
         CreatorFlowInfo memory creatorFlow = flowingCreators[_creator];
         uint256 timePassed = block.timestamp - creatorFlow.last;
-        uint256 cycleDuration = creatorFlow.cycle * 1 days;
+        uint256 cycleDuration = creatorFlow.cycle;
 
         if (timePassed < cycleDuration) {
             uint256 availableAmount = (timePassed * creatorFlow.cap) / cycleDuration;
@@ -145,13 +149,13 @@ contract YourContract is AccessControl, ReentrancyGuard {
     // Add a new creator's flow. No more than 25 creators are allowed.
     function addCreatorFlow(address payable _creator, uint256 _cap) public onlyAdmin {
         // Check for maximum creators.
-        if (activeCreators.length >= 25) revert MaxCreatorsReached();
+        if (activeCreators.length >= MAXCREATORS) revert MaxCreatorsReached();
         
         validateCreatorInput(_creator, _cap);
-        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, 30);
+        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, CYCLE);
         activeCreators.push(_creator);
         creatorIndex[_creator] = activeCreators.length - 1;
-        emit CreatorAdded(_creator, _cap, 30);
+        emit CreatorAdded(_creator, _cap, CYCLE);
     }
 
     // Validate the input for a creator.
@@ -182,11 +186,11 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
     uint256 timePassed = block.timestamp - creatorFlow.last;
 
     // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
-    if (30 days < timePassed) {
-        creatorFlow.last = block.timestamp - (30 days);
+    if (CYCLE < timePassed) {
+        creatorFlow.last = block.timestamp - (CYCLE);
     }
 
-    emit CreatorUpdated(_creator, _newCap, 30);
+    emit CreatorUpdated(_creator, _newCap, CYCLE);
 }
 
 
@@ -212,7 +216,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
         uint256 totalAmountCanWithdraw = availableCreatorAmount(msg.sender);
         if (totalAmountCanWithdraw < _amount) revert InsufficientInFlow(_amount, totalAmountCanWithdraw);
 
-        uint256 cappedLast = block.timestamp - (creatorFlow.cycle * 1 days);
+        uint256 cappedLast = block.timestamp - (creatorFlow.cycle);
         if (creatorFlow.last < cappedLast){
             creatorFlow.last = cappedLast;
         }
