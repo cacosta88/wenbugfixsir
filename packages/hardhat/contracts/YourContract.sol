@@ -224,7 +224,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 
         uint256 creatorflowLast = creatorFlow.last;
         uint256 timestamp = block.timestamp;
-        uint256 cappedLast = block.timestamp - (creatorFlow.cycle);
+        uint256 cappedLast = timestamp - (creatorFlow.cycle);
         if (creatorflowLast < cappedLast){
             creatorflowLast = cappedLast;
         }
