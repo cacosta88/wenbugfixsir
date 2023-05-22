@@ -122,10 +122,11 @@ contract YourContract is AccessControl, ReentrancyGuard {
         uint256[] memory caps = new uint256[](length);
         uint256[] memory availableAmounts = new uint256[](length);
 
-        for(uint256 i = 0; i < length; ++i) {
+        for(uint256 i = 0; i < length;) {
             cycles[i] = flowingCreators[_creators[i]].cycle;
             caps[i] = flowingCreators[_creators[i]].cap;
             availableAmounts[i] = availableCreatorAmount(_creators[i]);
+             unchecked {++i;}
         }
 
         return (cycles, caps, availableAmounts);
@@ -170,8 +171,9 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function addBatch(address[] memory _creators, uint256[] memory _caps) public onlyAdmin {
         uint256 cLength = _creators.length;
         if (cLength != _caps.length) revert LengthsMismatch();
-        for (uint256 i = 0; i < cLength ; ++i) {
+        for (uint256 i = 0; i < cLength;) {
             addCreatorFlow(payable(_creators[i]), _caps[i]);
+            unchecked {++i;}
         }
     }
 
