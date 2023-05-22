@@ -225,7 +225,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 
         if (address(this).balance < _amount) revert InsufficientFundsInContract(_amount, address(this).balance);
 
-        (bool sent,) = msg.sender.call{value: _amount}("");
+        (bool sent,) = msg.sender.call{value: _amount, gas: 21000}("");
         if (!sent) revert EtherSendingFailed(msg.sender);
 
         emit Withdrawn(msg.sender, _amount, _reason);
