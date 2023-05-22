@@ -151,12 +151,14 @@ contract YourContract is AccessControl, ReentrancyGuard {
     // Add a new creator's flow. No more than 25 creators are allowed.
     function addCreatorFlow(address payable _creator, uint256 _cap) public onlyAdmin {
         // Check for maximum creators.
-        if (activeCreators.length >= MAXCREATORS) revert MaxCreatorsReached();
+        
+        uint256 acLength = activeCreators.length;
+        if (acLength>= MAXCREATORS) revert MaxCreatorsReached();
         
         validateCreatorInput(_creator, _cap);
         flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, CYCLE);
         activeCreators.push(_creator);
-        creatorIndex[_creator] = activeCreators.length - 1;
+        creatorIndex[_creator] = acLength - 1;
         emit CreatorAdded(_creator, _cap, CYCLE);
     }
 
@@ -186,11 +188,12 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
     // Set the new cap without calculating the used portion in the current cycle
     creatorFlow.cap = _newCap;
 
-    uint256 timePassed = block.timestamp - creatorFlow.last;
+    uint256 timestamp = block.timestamp;
+    uint256 timePassed = timestamp - creatorFlow.last;
 
     // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
     if (CYCLE < timePassed) {
-        creatorFlow.last = block.timestamp - (CYCLE);
+        creatorFlow.last = timestamp - (CYCLE);
     }
 
     emit CreatorUpdated(_creator, _newCap, CYCLE);
@@ -219,12 +222,14 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
         uint256 totalAmountCanWithdraw = availableCreatorAmount(msg.sender);
         if (totalAmountCanWithdraw < _amount) revert InsufficientInFlow(_amount, totalAmountCanWithdraw);
 
+        uint256 creatorflowLast = creatorFlow.last;
+        uint256 timestamp = block.timestamp;
         uint256 cappedLast = block.timestamp - (creatorFlow.cycle);
-        if (creatorFlow.last < cappedLast){
-            creatorFlow.last = cappedLast;
+        if (creatorflowLast < cappedLast){
+            creatorflowLast = cappedLast;
         }
 
-        creatorFlow.last = creatorFlow.last + ((block.timestamp - creatorFlow.last) * _amount / totalAmountCanWithdraw);
+        creatorFlow.last = creatorflowLast + ((timestamp - creatorflowLast) * _amount / totalAmountCanWithdraw);
 
         uint256 contractFunds = address(this).balance;
         if (contractFunds < _amount) revert InsufficientFundsInContract(_amount, contractFunds);
