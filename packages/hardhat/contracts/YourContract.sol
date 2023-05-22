@@ -163,8 +163,8 @@ contract YourContract is AccessControl, ReentrancyGuard {
 
     // Add a batch of creators.
     function addBatch(address[] memory _creators, uint256[] memory _caps) public onlyAdmin {
-        if (_creators.length != _caps.length) revert LengthsMismatch();
         uint256 cLength = _creators.length;
+        if (cLength != _caps.length) revert LengthsMismatch();
         for (uint256 i = 0; i < cLength ; ++i) {
             addCreatorFlow(payable(_creators[i]), _caps[i]);
         }
