@@ -227,7 +227,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
         uint256 contractFunds = address(this).balance;
         if (contractFunds < _amount) revert InsufficientFundsInContract(_amount, contractFunds);
 
-        (bool sent,) = msg.sender.call{value: _amount, gas: 21000}("");
+        (bool sent,) = msg.sender.call{value: _amount, gas: 21000}(""); // Considered reasonable amount of gas limit for simple eth transfers, assuming recipient is an EOA
         if (!sent) revert EtherSendingFailed(msg.sender);
 
         emit Withdrawn(msg.sender, _amount, _reason);
@@ -239,7 +239,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
         if (remainingBalance == 0) revert NoFundsInContract();
 
         
-        (bool sent, ) = primaryAdmin.call{value: remainingBalance}("");
+        (bool sent, ) = primaryAdmin.call{value: remainingBalance}(""); // No gas limit imposed here in case deployer is a smart contract that executes additional logic upon receiving eth. Also considered that his function would be rarely called
         if (!sent) revert EtherSendingFailed(primaryAdmin);
 
         emit AgreementDrained(primaryAdmin, remainingBalance);
