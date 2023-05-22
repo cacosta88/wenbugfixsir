@@ -10,7 +10,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 // Defining custom errors for better error handling
 error NoValueSent();
-error InsufficientFundsInContract();
+error InsufficientFundsInContract(uint256 requested, uint256 available);
+error NoFundsInContract();
 error NoActiveFlowForCreator(address creator);
 error InsufficientInFlow(uint256 requested, uint256 available);
 error EtherSendingFailed(address recipient);
@@ -234,7 +235,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
     // Drain the agreement to the current primary admin
     function drainAgreement() public onlyAdmin nonReentrant {
         uint256 remainingBalance = address(this).balance;
-        if (remainingBalance == 0) revert InsufficientFundsInContract();
+        if (remainingBalance == 0) revert NoFundsInContract();
 
         
         (bool sent, ) = primaryAdmin.call{value: remainingBalance}("");
