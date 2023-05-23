@@ -5,7 +5,7 @@ import {
   useScaffoldContractRead,
 } from "~~/hooks/scaffold-eth";
 // import { useAccount } from "wagmi";
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 import { CreatorInfoDisplay } from "~~/components/CreatorInfoDisplay";
 import { useSetCreator } from "~~/hooks/useSetCreator";
 import { useFetchCreators } from "~~/hooks/useFetchCreators";
@@ -52,9 +52,18 @@ const Home: NextPage = () => {
   });
  
 
-    useSetCreator({allCreatorsData, creators, setCreatorsData});
+  // Use effect to handle setting the creators data. 
+  useEffect(() => {
+    if (Array.isArray(allCreatorsData) && creators.length > 0) {
+      useSetCreator({allCreatorsData, creators, setCreatorsData});
+    }
+  }, [allCreatorsData, creators]);
     
-
+  function toSetCreator() {
+    if (Array.isArray(allCreatorsData) && creators.length > 0) {
+      useSetCreator({allCreatorsData, creators, setCreatorsData});
+    }
+  }
 
 
 
