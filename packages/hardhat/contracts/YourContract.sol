@@ -152,13 +152,13 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function addCreatorFlow(address payable _creator, uint256 _cap) public onlyAdmin {
         // Check for maximum creators.
         
-        uint256 acLength = activeCreators.length;
-        if (acLength>= MAXCREATORS) revert MaxCreatorsReached();
+  
+        if (activeCreators.length >= MAXCREATORS) revert MaxCreatorsReached();
         
         validateCreatorInput(_creator, _cap);
         flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, CYCLE);
         activeCreators.push(_creator);
-        creatorIndex[_creator] = acLength - 1;
+        creatorIndex[_creator] = activeCreators.length - 1;
         emit CreatorAdded(_creator, _cap, CYCLE);
     }
 
