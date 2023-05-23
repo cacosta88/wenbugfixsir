@@ -89,7 +89,6 @@ const Admin = () => {
         setSuccessMessage("Creator added successfully.");
         setCreator("");
         setCap(undefined);
-        setCycle(undefined);
       } else if (modalAction === "fund") {
 
         if (!fundingValue) {
