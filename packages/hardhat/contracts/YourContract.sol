@@ -104,7 +104,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
         stopped = _enable;
     }
 
-     // Get all creators' data. (if this functio  is not used in the front end it can be dropped)
+     // Get all creators' data. 
     function allCreatorsData(address[] calldata _creators) public view returns (CreatorFlowInfo[] memory) {
         uint256 creatorLength = _creators.length;
         CreatorFlowInfo[] memory result = new CreatorFlowInfo[](creatorLength);
