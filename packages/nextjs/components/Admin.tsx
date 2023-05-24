@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { useState } from "react";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { EtherInput } from "./scaffold-eth";
+import { AddressInput, EtherInput, IntegerInput } from "./scaffold-eth";
 
 const Admin = () => {
 
@@ -217,22 +217,13 @@ const Admin = () => {
               <label htmlFor="creator" className="block mt-4">
                 Creator Address:
               </label>
-              <input
-                type="text"
-                id="creator"
-                className="input w-full"
-                value={creator}
-                onChange={(e) => setCreator(e.target.value)}
-              />
+              <AddressInput value={creator} onChange={value => setCreator(value)} />
               <label htmlFor="cap" className="block mt-4">
                 Cap:
               </label>
-              <input
-                type="text"
-                id="cap"
-                className="input w-full"
-                value={cap?.toString()}
-                onChange={(e) => setCap(BigNumber.from(e.target.value))}
+              <IntegerInput
+                value={cap ? BigNumber.from(cap?.toString()) : ""}
+                onChange={value => setCap(BigNumber.from(value))}
               />
             </div>
           )}
@@ -243,23 +234,19 @@ const Admin = () => {
                   <label htmlFor={`batch-creators-${index}`} className="block mt-4">
                     Creator Address {index + 1}:
                   </label>
-                  <input
-                    type="text"
-                    id={`batch-creators-${index}`}
-                    className="input w-full"
-                    // value={creator}
-                    onChange={(e) => handleInputChange(index, e.target.value, setBatchCreators)}
+                  <AddressInput
+                    name={`batch-creators-${index}`}
+                    value={creator}
+                    onChange={value => handleInputChange(index, value, setBatchCreators)}
                   />
 
                   <label htmlFor={`batch-caps-${index}`} className="block mt-4">
                     Cap {index + 1}:
                   </label>
-                  <input
-                    type="text w-full"
-                    id={`batch-caps-${index}`}
-                    className="input"
-                    // value={Number(batchCaps[index])}
-                    onChange={(e) => handleInputChange(index, e.target.value, setBatchCaps)}
+                  <IntegerInput
+                    name={`batch-caps-${index}`}
+                    value={batchCaps[index] ? BigNumber.from(batchCaps[index]) : ""}
+                    onChange={value => handleInputChange(index, value?.toString(), setBatchCaps)}
                   />
 
                 </div>
@@ -289,24 +276,15 @@ const Admin = () => {
               <label htmlFor="creator" className="block mt-4">
                 Creator Address:
               </label>
-              <input
-                type="text"
-                id="creator"
-                className="input w-full"
-                value={creator}
-                onChange={(e) => setCreator(e.target.value)}
-              />
+              <AddressInput value={creator} onChange={value => setCreator(value)} />
               {modalAction === "add" && (
                 <>
                   <label htmlFor="cap" className="block mt-4">
                     Cap:
                   </label>
-                  <input
-                    type="text"
-                    id="cap"
-                    className="input w-full"
-                    // value={cap}
-                    onChange={(e) => setCap(BigNumber.from(e.target.value.toString()))}
+                  <IntegerInput
+                    value={cap ? BigNumber.from(cap) : ""}
+                    onChange={value => (value ? setCap(BigNumber.from(value)) : setCap(undefined))}
                   />
                 </>
               )}
