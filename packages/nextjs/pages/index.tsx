@@ -1,9 +1,72 @@
 import Head from "next/head";
-import Link from "next/link";
 import type { NextPage } from "next";
-import { BugAntIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import {
+  useDeployedContractInfo,
+  useScaffoldContractRead,
+} from "~~/hooks/scaffold-eth";
+// import { useAccount } from "wagmi";
+import { useEffect, useState } from "react";
+import { CreatorInfoDisplay } from "~~/components/CreatorInfoDisplay";
+import { useSetCreator } from "~~/hooks/useSetCreator";
+import { useFetchCreators } from "~~/hooks/useFetchCreators";
+// import { useAccountBalance } from "~~/hooks/scaffold-eth";
+import { Balance } from "~~/components/scaffold-eth";
+
+
+
+export type CreatorInfo = {
+  cap: string;
+  last: string;
+  cycle: string;
+  unlocked: string;
+}
+export type CreatorData = {
+  [address: string]: CreatorInfo; 
+}
 
 const Home: NextPage = () => {
+  // All creator data.
+  const [creatorsData, setCreatorsData] = useState<CreatorData>({});
+
+  const streamContract = useDeployedContractInfo("YourContract");
+
+  // const streamContractBalance = useAccountBalance(streamContract.data?.address);
+
+
+  const {
+    creators,
+    // isLoadingCreators,
+    // errorReadingCreators,
+  } = useFetchCreators();
+
+  
+
+  // Get all creator data.
+  const {
+    data: allCreatorsData,
+    // isLoading: isLoadingAllCreatorData 
+  } = useScaffoldContractRead({
+    contractName: "YourContract",
+    functionName: "allCreatorsData",
+    args: [creators],
+  });
+ 
+
+  // Use effect to handle setting the creators data. 
+  useEffect(() => {
+    if (Array.isArray(allCreatorsData) && creators.length > 0) {
+      useSetCreator({allCreatorsData, creators, setCreatorsData});
+    }
+  }, [allCreatorsData, creators]);
+    
+  function toSetCreator() {
+    if (Array.isArray(allCreatorsData) && creators.length > 0) {
+      useSetCreator({allCreatorsData, creators, setCreatorsData});
+    }
+  }
+
+
+
   return (
     <>
       <Head>
@@ -12,44 +75,25 @@ const Home: NextPage = () => {
       </Head>
 
       <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center mb-8">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold">packages/nextjs/pages/index.tsx</code>
+        <div className="max-w-[40rem] m-auto w-[90%] mb-10">
+          <p>
+            We&apos;re running an experiment to retroactively fund open-source work by providing a monthly UBI to open-source
+            developers and rewarding them for their ongoing contributions
+            to the ecosystem.
           </p>
-          <p className="text-center text-lg">
-            Edit your smart contract <code className="italic bg-base-300 text-base font-bold">YourContract.sol</code> in{" "}
-            <code className="italic bg-base-300 text-base font-bold">packages/hardhat/contracts</code>
+          <p>
+            Chosen developers can submit their monthly projects, automatically claim grant streams, and showcase their
+            work to the public.
           </p>
+          <p>This initiative is made possible by BuidlGuidl!</p>
         </div>
-
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contract
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <SparklesIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Experiment with{" "}
-                <Link href="/example-ui" passHref className="link">
-                  Example UI
-                </Link>{" "}
-                to build your own UI.
-              </p>
-            </div>
-          </div>
+        <div className="w-full items-end pt-7 flex justify-center">
+          <Balance className="font-bold" address={streamContract.data?.address} />
+        </div>
+        <div className="flex flex-col p-5 text-center items-center max-w-full rounded-3xl">
+          {Object.entries(creatorsData).map(([creatorAddress, creatorData]) => (
+            <CreatorInfoDisplay key={creatorAddress} creatorData={creatorData} creatorAddress={creatorAddress} />
+          ))}
         </div>
       </div>
     </>
