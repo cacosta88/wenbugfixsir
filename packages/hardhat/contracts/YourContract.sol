@@ -213,13 +213,14 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
             creatorflowLast = cappedLast;
         }
 
-        creatorFlow.last = creatorflowLast + ((timestamp - creatorflowLast) * _amount / totalAmountCanWithdraw);
 
         uint256 contractFunds = address(this).balance;
         if (contractFunds < _amount) revert InsufficientFundsInContract(_amount, contractFunds);
 
         (bool sent,) = msg.sender.call{value: _amount, gas: 21000}(""); // Considered reasonable amount of gas limit for simple eth transfers, assuming recipient is an EOA
         if (!sent) revert EtherSendingFailed(msg.sender);
+        
+        creatorFlow.last = creatorflowLast + ((timestamp - creatorflowLast) * _amount / totalAmountCanWithdraw);
 
         emit Withdrawn(msg.sender, _amount, _reason);
     }
