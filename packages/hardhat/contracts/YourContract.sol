@@ -63,7 +63,6 @@ contract YourContract is AccessControl, ReentrancyGuard {
     struct CreatorFlowInfo {
         uint256 cap; // Maximum amount of funds that can be withdrawn in a cycle (in wei)
         uint256 last; // The timestamp of the last withdrawal
-        uint256 cycle; // Duration of a cycle (in days)
     }
 
     // Mapping to store the flow info of each creator
@@ -120,7 +119,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
         CreatorFlowInfo memory creatorFlow = flowingCreators[_creator];
         uint256 timePassed = block.timestamp - creatorFlow.last;
-        uint256 cycleDuration = creatorFlow.cycle;
+        uint256 cycleDuration = 30 days;
 
         if (timePassed < cycleDuration) {
             uint256 availableAmount = (timePassed * creatorFlow.cap) / cycleDuration;
@@ -140,7 +139,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
         if (activeCreators.length >= MAXCREATORS) revert MaxCreatorsReached();
         
         validateCreatorInput(_creator, _cap);
-        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, CYCLE);
+        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp);
         activeCreators.push(_creator);
         creatorIndex[_creator] = activeCreators.length - 1;
         emit CreatorAdded(_creator, _cap, CYCLE);
@@ -208,7 +207,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 
         uint256 creatorflowLast = creatorFlow.last;
         uint256 timestamp = block.timestamp;
-        uint256 cappedLast = timestamp - (creatorFlow.cycle);
+        uint256 cappedLast = timestamp - 30 days;
         if (creatorflowLast < cappedLast){
             creatorflowLast = cappedLast;
         }
