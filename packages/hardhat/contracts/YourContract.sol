@@ -46,7 +46,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
 
     // Constructor to setup admin role
     constructor(address _primaryAdmin) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, _primaryAdmin);
         primaryAdmin = _primaryAdmin;
     }
 
