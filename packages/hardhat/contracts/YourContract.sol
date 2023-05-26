@@ -119,7 +119,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
         CreatorFlowInfo memory creatorFlow = flowingCreators[_creator];
         uint256 timePassed = block.timestamp - creatorFlow.last;
-        uint256 cycleDuration = 30 days;
+        uint256 cycleDuration = CYCLE;
 
         if (timePassed < cycleDuration) {
             uint256 availableAmount = (timePassed * creatorFlow.cap) / cycleDuration;
@@ -207,7 +207,7 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 
         uint256 creatorflowLast = creatorFlow.last;
         uint256 timestamp = block.timestamp;
-        uint256 cappedLast = timestamp - 30 days;
+        uint256 cappedLast = timestamp - CYCLE;
         if (creatorflowLast < cappedLast){
             creatorflowLast = cappedLast;
         }
