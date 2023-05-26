@@ -183,13 +183,16 @@ function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) pu
 }
 
 
-    // Remove a creator's flow.
     function removeCreatorFlow(address _creator) public onlyAdmin isFlowActive(_creator) {
         uint256 creatorIndexToRemove = creatorIndex[_creator];
         address lastCreator = activeCreators[activeCreators.length - 1];
+        
+        // Check if the creator to be removed is the last one in the list
+        if (_creator != lastCreator) {
+            activeCreators[creatorIndexToRemove] = lastCreator;
+            creatorIndex[lastCreator] = creatorIndexToRemove;
+        }
 
-        activeCreators[creatorIndexToRemove] = lastCreator;
-        creatorIndex[lastCreator] = creatorIndexToRemove;
         activeCreators.pop();
 
         delete flowingCreators[_creator];
