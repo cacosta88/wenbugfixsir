@@ -41,7 +41,7 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo, creatorAdd
             </div>          
           </div>
           <div className="w-full">
-            <progress className="progress progress-primary" value={90} max="100"></progress>
+            <progress className="progress progress-primary" value={percentage} max="100"></progress>
           </div>
           <div className="flex flex-row">
             <div className="flex flex-row items-center">

@@ -63,7 +63,6 @@ contract YourContract is AccessControl, ReentrancyGuard {
     struct CreatorFlowInfo {
         uint256 cap; // Maximum amount of funds that can be withdrawn in a cycle (in wei)
         uint256 last; // The timestamp of the last withdrawal
-        uint256 cycle; // Duration of a cycle (in days)
     }
 
     // Mapping to store the flow info of each creator
@@ -108,9 +107,9 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function allCreatorsData(address[] calldata _creators) public view returns (CreatorFlowInfo[] memory) {
         uint256 creatorLength = _creators.length;
         CreatorFlowInfo[] memory result = new CreatorFlowInfo[](creatorLength);
-        for (uint256 i = 0; i < creatorLength; i = unsafe_inc(i)) {
+        for (uint256 i = 0; i < creatorLength; ++i) {
             address creatorAddress = _creators[i];
-            result[i] = flowingCreators[creatorAddress];
+            result[i] =flowingCreators[creatorAddress];
         }
         return result;
     }
@@ -120,7 +119,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function availableCreatorAmount(address _creator) public view isFlowActive(_creator) returns (uint256) {
         CreatorFlowInfo memory creatorFlow = flowingCreators[_creator];
         uint256 timePassed = block.timestamp - creatorFlow.last;
-        uint256 cycleDuration = creatorFlow.cycle;
+        uint256 cycleDuration = CYCLE;
 
         if (timePassed < cycleDuration) {
             uint256 availableAmount = (timePassed * creatorFlow.cap) / cycleDuration;
@@ -140,7 +139,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
         if (activeCreators.length >= MAXCREATORS) revert MaxCreatorsReached();
         
         validateCreatorInput(_creator, _cap);
-        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp, CYCLE);
+        flowingCreators[_creator] = CreatorFlowInfo(_cap, block.timestamp);
         activeCreators.push(_creator);
         creatorIndex[_creator] = activeCreators.length - 1;
         emit CreatorAdded(_creator, _cap, CYCLE);
@@ -157,39 +156,43 @@ contract YourContract is AccessControl, ReentrancyGuard {
     function addBatch(address[] memory _creators, uint256[] memory _caps) public onlyAdmin {
         uint256 cLength = _creators.length;
         if (cLength != _caps.length) revert LengthsMismatch();
-        for (uint256 i = 0; i < cLength; i = unsafe_inc(i)) {
+        for (uint256 i = 0; i < cLength;) {
             addCreatorFlow(payable(_creators[i]), _caps[i]);
+            unchecked {++i;}
         }
     }
 
-    // Update a creator's flow cap and cycle.
-    function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) public onlyAdmin isFlowActive(_creator) {
-        if (_newCap == 0) revert CapCannotBeZero();
+   // Update a creator's flow cap and cycle.
+function updateCreatorFlowCapCycle(address payable _creator, uint256 _newCap) public onlyAdmin isFlowActive(_creator) {
+    if (_newCap == 0) revert CapCannotBeZero();
 
-        CreatorFlowInfo storage creatorFlow = flowingCreators[_creator];
+    CreatorFlowInfo storage creatorFlow = flowingCreators[_creator];
 
-        // Set the new cap without calculating the used portion in the current cycle
-        creatorFlow.cap = _newCap;
+    // Set the new cap without calculating the used portion in the current cycle
+    creatorFlow.cap = _newCap;
 
-        uint256 timestamp = block.timestamp;
-        uint256 timePassed = timestamp - creatorFlow.last;
+    uint256 timestamp = block.timestamp;
+    uint256 timePassed = timestamp - creatorFlow.last;
 
-        // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
-        if (CYCLE < timePassed) {
-            creatorFlow.last = timestamp - (CYCLE);
-        }
-
-        emit CreatorUpdated(_creator, _newCap, CYCLE);
+    // Only change the cycle start timestamp if the new cycle is less than the time passed since the last withdrawal
+    if (CYCLE < timePassed) {
+        creatorFlow.last = timestamp - (CYCLE);
     }
 
+    emit CreatorUpdated(_creator, _newCap, CYCLE);
+}
 
-    // Remove a creator's flow.
+
     function removeCreatorFlow(address _creator) public onlyAdmin isFlowActive(_creator) {
         uint256 creatorIndexToRemove = creatorIndex[_creator];
         address lastCreator = activeCreators[activeCreators.length - 1];
+        
+        // Check if the creator to be removed is the last one in the list
+        if (_creator != lastCreator) {
+            activeCreators[creatorIndexToRemove] = lastCreator;
+            creatorIndex[lastCreator] = creatorIndexToRemove;
+        }
 
-        activeCreators[creatorIndexToRemove] = lastCreator;
-        creatorIndex[lastCreator] = creatorIndexToRemove;
         activeCreators.pop();
 
         delete flowingCreators[_creator];
@@ -207,7 +210,7 @@ contract YourContract is AccessControl, ReentrancyGuard {
 
         uint256 creatorflowLast = creatorFlow.last;
         uint256 timestamp = block.timestamp;
-        uint256 cappedLast = timestamp - (creatorFlow.cycle);
+        uint256 cappedLast = timestamp - CYCLE;
         if (creatorflowLast < cappedLast){
             creatorflowLast = cappedLast;
         }
@@ -234,10 +237,6 @@ contract YourContract is AccessControl, ReentrancyGuard {
         if (!sent) revert EtherSendingFailed(primaryAdmin);
 
         emit AgreementDrained(primaryAdmin, remainingBalance);
-    }
-
-    function unsafe_inc(uint x) private pure returns (uint) {
-        unchecked { return x + 1; }
     }
 
     // Fallback function to receive ether

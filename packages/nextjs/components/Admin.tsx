@@ -6,10 +6,10 @@ import { AddressInput, EtherInput, IntegerInput } from "./scaffold-eth";
 const Admin = () => {
 
   const [modalAction, setModalAction] = useState<string>("add");
-  // The follow two states hold args for addCreatorFlow.
+  // The following two states hold args for addCreatorFlow.
   const [creator, setCreator] = useState<string>("");
   const [cap, setCap] = useState<BigNumber | undefined>(undefined);
-  // The follow two states hold args for addBatchCreatorFlow.
+  // The following two states hold args for addBatchCreatorFlow.
   const [batchCreators, setBatchCreators] = useState<string[]>([]);
   const [batchCaps, setBatchCaps] = useState<BigNumber[]>([]);
 
@@ -171,6 +171,17 @@ const Admin = () => {
     setModalAction(action);
   };
 
+  const reset = () => {
+    setCreator("");
+    setCap(undefined);
+    setBatchCreators([]);
+    setBatchCaps([]);
+    setLoading(false);
+    setSuccessMessage("");
+    setErrorMessage("");
+    setFundingValue(0);
+  };
+
   console.log(successMessage, errorMessage, loading);
       
   return (
@@ -221,10 +232,12 @@ const Admin = () => {
               <label htmlFor="cap" className="block mt-4">
                 Cap:
               </label>
-              <IntegerInput
-                value={cap ? BigNumber.from(cap?.toString()) : ""}
-                onChange={value => setCap(BigNumber.from(value))}
-              />
+              <input
+                    type="text"
+                    id="cap"
+                    className="input w-full"
+                    onChange={(e) => setCap(BigNumber.from(e.target.value.toString()))}
+                  />
             </div>
           )}
           {modalAction === "batchAdd" && (
@@ -282,9 +295,11 @@ const Admin = () => {
                   <label htmlFor="cap" className="block mt-4">
                     Cap:
                   </label>
-                  <IntegerInput
-                    value={cap ? BigNumber.from(cap) : ""}
-                    onChange={value => (value ? setCap(BigNumber.from(value)) : setCap(undefined))}
+                  <input
+                    type="text"
+                    id="cap"
+                    className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 border border-solid border-gray-700 w-full font-medium placeholder:text-accent/50 text-gray-400 bg-base-300"
+                    onChange={(e) => setCap(BigNumber.from(e.target.value.toString()))}
                   />
                 </>
               )}
@@ -300,8 +315,8 @@ const Admin = () => {
                 {modalAction === "fund" && "Fund"}
               </button>
             }
-            <button className="btn" onClick={() => setModalAction("")}>
-              Clear
+            <button className="btn" onClick={reset}>
+              reset
             </button>
           </div>
         </div>

@@ -11,6 +11,7 @@ import { useSetCreator } from "~~/hooks/useSetCreator";
 import { useFetchCreators } from "~~/hooks/useFetchCreators";
 // import { useAccountBalance } from "~~/hooks/scaffold-eth";
 import { Balance } from "~~/components/scaffold-eth";
+import ContractEvents from "~~/components/contractEvents";
 
 
 
@@ -18,7 +19,6 @@ export type CreatorInfo = {
   cap: string;
   last: string;
   cycle: string;
-  unlocked: string;
 }
 export type CreatorData = {
   [address: string]: CreatorInfo; 
@@ -39,13 +39,11 @@ const Home: NextPage = () => {
     // errorReadingCreators,
   } = useFetchCreators();
 
+
   
 
   // Get all creator data.
-  const {
-    data: allCreatorsData,
-    // isLoading: isLoadingAllCreatorData 
-  } = useScaffoldContractRead({
+  const { data: allCreatorsData, isLoading: isLoadingAllCreatorData } = useScaffoldContractRead({
     contractName: "YourContract",
     functionName: "allCreatorsData",
     args: [creators],
@@ -59,11 +57,7 @@ const Home: NextPage = () => {
     }
   }, [allCreatorsData, creators]);
     
-  function toSetCreator() {
-    if (Array.isArray(allCreatorsData) && creators.length > 0) {
-      useSetCreator({allCreatorsData, creators, setCreatorsData});
-    }
-  }
+  // console.log(creatorsData);
 
 
 
@@ -77,8 +71,8 @@ const Home: NextPage = () => {
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="max-w-[40rem] m-auto w-[90%] mb-10">
           <p>
-            We&apos;re running an experiment to retroactively fund open-source work by providing a monthly UBI to open-source
-            developers and rewarding them for their ongoing contributions
+            We're running an experiment to retroactively fund open-source work by providing a monthly UBI to open-source
+            developers, handpicked by Jessy and Jessy's Hacker House, and rewarding them for their ongoing contributions
             to the ecosystem.
           </p>
           <p>
@@ -94,6 +88,9 @@ const Home: NextPage = () => {
           {Object.entries(creatorsData).map(([creatorAddress, creatorData]) => (
             <CreatorInfoDisplay key={creatorAddress} creatorData={creatorData} creatorAddress={creatorAddress} />
           ))}
+        </div>
+        <div className="w-full pt-40">
+          <ContractEvents />
         </div>
       </div>
     </>
