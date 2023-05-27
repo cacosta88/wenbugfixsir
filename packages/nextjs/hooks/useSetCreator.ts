@@ -14,16 +14,16 @@ export function useSetCreator({allCreatorsData, creators, setCreatorsData}: Prop
           allCreatorsData.forEach((creatorData: any, index: number) => {
             const creatorAddress = creators[index];
     
-            const { last, cap, cycle } = creatorData;
+            const { last, cap } = creatorData;
             // Convert cap to ether
             const capValue = parseFloat(formatEther(cap));
+            console.log(cap)
            
       
             // Associate the creator address with the calculated data
             newData[creatorAddress] = {
               cap: capValue.toString(),
               last: last.toString(),
-              cycle: cycle.toString(),
             };
           });
       

@@ -70,7 +70,7 @@ const Creator = () => {
   return (
     <div className="w-full flex justify-center p-6 ">
       {/* The button to open modal */}
-      <label htmlFor="my-modal" className="btn">
+      <label htmlFor="my-modal" className="btn btn-primary rounded-lg">
         Withdraw
       </label>
 
@@ -90,7 +90,7 @@ const Creator = () => {
             <input type="text" id="reason" className="w-full py-2 input" value={reason} onChange={handleReasonChange} />
           </div>
           <div className="modal-action">
-            <button onClick={handleWithdraw} disabled={isWithdrawing}>
+            <button onClick={handleWithdraw} className="btn rounded-lg" disabled={isWithdrawing}>
               Withdraw
             </button>
           </div>

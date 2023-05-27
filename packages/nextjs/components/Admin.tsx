@@ -2,6 +2,9 @@ import { BigNumber } from "ethers";
 import { useState } from "react";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { AddressInput, EtherInput, IntegerInput } from "./scaffold-eth";
+import { debounce } from "lodash";
+import { parseEther } from "ethers/lib/utils.js";
+
 
 const Admin = () => {
 
@@ -157,14 +160,26 @@ const Admin = () => {
     setBatchCreators((prev) => [...prev, ""]);
     setBatchCaps((prev) => [...prev, BigNumber.from(0)]);
   };
+
+  const handleBatchCapChange = (index: number, value: string) => {
+    const parsedValue = parseFloat(value);
+    if (isNaN(parsedValue)) {
+      handleInputChange(index, undefined, setBatchCaps);
+    } else {
+      const weiValue = parseEther(parsedValue.toString());
+      handleInputChange(index, weiValue.toString(), setBatchCaps);
+    }
+  };
+  
     
-  const handleInputChange = (index: number, value: string, setState: any) => {
+  const handleInputChange = (index: number, value: string | undefined, setState: any) => {
     setState((prevState: any) => {
       const updatedState = [...prevState];
-      updatedState[index] = value;
+      updatedState[index] = value !== undefined ? value : "";
       return updatedState;
     });
   };
+  
 
   
   const handleModalActionSelect = (action: string) => {
@@ -182,7 +197,6 @@ const Admin = () => {
     setFundingValue(0);
   };
 
-  console.log(successMessage, errorMessage, loading);
       
   return (
     <div className="flex justify-center items-center">
@@ -233,11 +247,20 @@ const Admin = () => {
                 Cap:
               </label>
               <input
-                    type="text"
-                    id="cap"
-                    className="input w-full"
-                    onChange={(e) => setCap(BigNumber.from(e.target.value.toString()))}
-                  />
+                type="number"
+                id="cap"
+                className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 border border-2 border-solid border-base-300 focus:text-gray-400 px-4 w-full font-medium placeholder:text-accent/50 text-gray-700 dark:text-gray-200"
+                // value={cap?.toString()}
+                onChange={(e) => {
+                  const value = e.target.value.trim();
+                  const weiValue = parseFloat(value) * 1e18; // Convert value to wei
+                  if (isNaN(weiValue)) {
+                    setCap(undefined);
+                  } else {
+                    setCap(BigNumber.from(weiValue.toString()));
+                  }
+                }}
+              />
             </div>
           )}
           {modalAction === "batchAdd" && (
@@ -256,10 +279,12 @@ const Admin = () => {
                   <label htmlFor={`batch-caps-${index}`} className="block mt-4">
                     Cap {index + 1}:
                   </label>
-                  <IntegerInput
-                    name={`batch-caps-${index}`}
-                    value={batchCaps[index] ? BigNumber.from(batchCaps[index]) : ""}
-                    onChange={value => handleInputChange(index, value?.toString(), setBatchCaps)}
+                  <input
+                    type="text"
+                    id={`batch-caps-${index}`}
+                    className="input focus:outline-none focus:bg-transparent focus:text-gray-400 h-10 min-h-[2.2rem] px-4 border-2 border-solid border-base-300 w-full font-medium placeholder:text-accent/50 text-gray-400"
+                    // value={batchCaps[index] !== undefined ? batchCaps[index].divideBy(1e18).toString() : ""}
+                    onChange={(e) => handleBatchCapChange(index, e.target.value)}
                   />
 
                 </div>
@@ -296,18 +321,29 @@ const Admin = () => {
                     Cap:
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     id="cap"
-                    className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 border border-solid border-gray-700 w-full font-medium placeholder:text-accent/50 text-gray-400 bg-base-300"
-                    onChange={(e) => setCap(BigNumber.from(e.target.value.toString()))}
-                  />
+                    className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 border border-2 border-solid border-base-300 focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 w-full font-medium placeholder:text-accent/50 text-gray-700 dark:text-gray-200"
+                    // value={cap?.toString()}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      const weiValue = parseFloat(value) * 1e18; // Convert value to wei
+                      if (isNaN(weiValue)) {
+                        setCap(undefined);
+                      } else {
+                        setCap(BigNumber.from(weiValue.toString()));
+                      }
+                    }} />
                 </>
               )}
             </div>
           )}
           <div className="flex justify-between mt-8">
+            <button className="btn rounded-lg" onClick={reset}>
+              reset
+            </button>
             {modalAction &&
-              <button className="btn btn-primary" onClick={handleModalAction}>
+              <button className="btn btn-primary rounded-lg" onClick={handleModalAction}>
                 {modalAction === "add" && "Add"}
                 {modalAction === "batchAdd" && "Add Batch"}
                 {modalAction === "update" && "Update"}
@@ -315,9 +351,6 @@ const Admin = () => {
                 {modalAction === "fund" && "Fund"}
               </button>
             }
-            <button className="btn" onClick={reset}>
-              reset
-            </button>
           </div>
         </div>
       </div>

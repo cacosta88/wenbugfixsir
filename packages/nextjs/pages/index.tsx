@@ -18,7 +18,6 @@ import ContractEvents from "~~/components/contractEvents";
 export type CreatorInfo = {
   cap: string;
   last: string;
-  cycle: string;
 }
 export type CreatorData = {
   [address: string]: CreatorInfo; 

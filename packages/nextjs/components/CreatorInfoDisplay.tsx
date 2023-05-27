@@ -11,10 +11,8 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo, creatorAdd
   const { unlockedAmount } = useCreatorUnlockedAmount(creatorAddress);
   const cap = Number(creatorData.cap);
   const last = Number(creatorData.last);
-  // const cycle = creatorData.cycle;
   const percentage = cap > 0 ? (Number(unlockedAmount) / cap) * 100 : 0;
 
-  console.log(percentage);
   
     return (
       <div className="flex items-center justify-between tracking-widest w-full p-4 rounded-lg bg-base-200 flex-row space-x-6 space-y-6">

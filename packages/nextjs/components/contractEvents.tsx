@@ -122,7 +122,7 @@ const ContractEvents = () => {
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
                 <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
-                <div className="pl-4">{formatUnits(event.args[2], 0)} days</div>
+                <div className="pl-4">30 days</div>
               </div>
             </div>
           ))}
