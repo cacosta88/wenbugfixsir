@@ -26,7 +26,7 @@ error AccessDenied();
 contract YourContract is AccessControl, ReentrancyGuard {
 
     // Fixed cycle and max creators
-    uint256 immutable CYCLE = 30 days;
+    uint256 immutable CYCLE = 1 days; // for quick testing.
     uint256 immutable MAXCREATORS = 25;
  
     // Emergency mode variable
@@ -46,7 +46,8 @@ contract YourContract is AccessControl, ReentrancyGuard {
 
     // Constructor to setup admin role
     constructor(address _primaryAdmin) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, _primaryAdmin);
+        _setupRole(ADMIN_ROLE, msg.sender); // Give deployer admin role.
         primaryAdmin = _primaryAdmin;
     }
 
