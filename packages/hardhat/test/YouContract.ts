@@ -70,7 +70,7 @@ describe("YourContract", function () {
 
       });
 
-  describe("Update creator flow cap and cycle", function () {
+  describe("Update creator flow cap", function () {
     it("Should correctly update a creator flow cap", async function () {
       await yourContract.connect(admin).addCreatorFlow(addr1.address, 100);
       await yourContract.connect(admin).updateCreatorFlowCapCycle(addr1.address, 200);
