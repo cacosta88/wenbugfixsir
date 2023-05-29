@@ -1,3 +1,6 @@
+import { LockIcon } from "./LockIcon";
+import { Price } from "./Price";
+import { UnlockIcon } from "./UnlockIcon";
 import { Address } from "./scaffold-eth";
 import { useCreatorUnlockedAmount } from "~~/hooks/useCreatorUnlockedAmount";
 import { CreatorInfo } from "~~/pages";
@@ -21,42 +24,20 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
       <div className="flex flex-col w-fit lg:w-[250px]">
         <div className="flex flex-row">
           <div className="flex items-center w-full">
-            <div className="px-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                />
-              </svg>
+            <div className="px-1">
+              <LockIcon />
             </div>
-            <div className="flex-grow-1">Ξ {cap}</div>
+            <div className="flex-grow-2">
+              Ξ <Price value={cap} />
+            </div>
           </div>
           <div className="flex items-center w-full">
-            <div className="px-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                />
-              </svg>
+            <div className="px-1">
+              <UnlockIcon />
             </div>
-            <div className="flex-grow-1">{Number(unlockedAmount).toFixed(4)}</div>
+            <div className="flex-grow-1">
+              <Price value={Number(unlockedAmount)} />
+            </div>
           </div>
         </div>
         <div className="w-full">
