@@ -1,18 +1,15 @@
-import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 import { useEffect, useState } from "react";
 import { Address } from "./scaffold-eth";
-import { formatEther, formatUnits } from "ethers/lib/utils.js";
-
+import { formatEther } from "ethers/lib/utils.js";
+import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 
 const ContractEvents = () => {
-
   const [fundsReceivedEvents, setFundsReceivedEvents] = useState<any[] | undefined>([]);
   const [withdrawnEvents, setWithdrawnEvents] = useState<any[] | undefined>([]);
   const [creatorAddedEvents, setCreatorAddedEvents] = useState<any[] | undefined>([]);
   const [creatorUpdatedEvents, setCreatorUpdatedEvents] = useState<any[] | undefined>([]);
   const [creatorRemovedEvents, setCreatorRemovedEvents] = useState<any[] | undefined>([]);
   const [agreementDrainedEvents, setAgreementDrainedEvents] = useState<any[] | undefined>([]);
-
 
   const fundsReceived = useScaffoldEventHistory({
     contractName: "YourContract",
@@ -59,31 +56,27 @@ const ContractEvents = () => {
   useEffect(() => {
     setFundsReceivedEvents(fundsReceived.data);
   }, [fundsReceived]);
-  
+
   useEffect(() => {
     setWithdrawnEvents(withdrawn.data);
   }, [withdrawn]);
-  
+
   useEffect(() => {
     setCreatorAddedEvents(creatorAdded.data);
   }, [creatorAdded]);
-  
+
   useEffect(() => {
     setCreatorUpdatedEvents(creatorUpdated.data);
   }, [creatorUpdated]);
-  
+
   useEffect(() => {
     setCreatorRemovedEvents(creatorRemoved.data);
   }, [creatorRemoved]);
-  
+
   useEffect(() => {
     setAgreementDrainedEvents(agreementDrained.data);
   }, [agreementDrained]);
-  
 
-  
-  
-    
   return (
     <div className="space-y-4 flex flex-col justify-center items-center">
       {fundsReceivedEvents && fundsReceivedEvents.length > 0 && (
@@ -136,7 +129,7 @@ const ContractEvents = () => {
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
                 <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
-                <div className="pl-4">{formatUnits(event.args[2], 0)} days</div>
+                <div className="pl-4">30 days</div>
               </div>
             </div>
           ))}
@@ -169,7 +162,6 @@ const ContractEvents = () => {
       )}
     </div>
   );
-  
 };
 
 export default ContractEvents;

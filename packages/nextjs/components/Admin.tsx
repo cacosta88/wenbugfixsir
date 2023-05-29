@@ -1,20 +1,18 @@
-import { BigNumber } from "ethers";
 import { useState } from "react";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { AddressInput, EtherInput, IntegerInput } from "./scaffold-eth";
-import { debounce } from "lodash";
+import { AddressInput, EtherInput } from "./scaffold-eth";
+import { BigNumber } from "ethers";
 import { parseEther } from "ethers/lib/utils.js";
-
+import { debounce } from "lodash";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const Admin = () => {
-
   const [modalAction, setModalAction] = useState<string>("add");
   // The following two states hold args for addCreatorFlow.
   const [creator, setCreator] = useState<string>("");
-  const [cap, setCap] = useState<BigNumber | undefined>(undefined);
+  const [cap, setCap] = useState<string>("");
   // The following two states hold args for addBatchCreatorFlow.
-  const [batchCreators, setBatchCreators] = useState<string[]>([]);
-  const [batchCaps, setBatchCaps] = useState<BigNumber[]>([]);
+  const [batchCreators, setBatchCreators] = useState<string[] | undefined>();
+  const [batchCaps, setBatchCaps] = useState<string[] | undefined>();
 
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -22,38 +20,40 @@ const Admin = () => {
 
   const [fundingValue, setFundingValue] = useState<number>(0);
 
-
-
-  // Write hook for adding a creator.  
-  const { 
+  // Write hook for adding a creator.
+  const {
     writeAsync: addCreator,
     // isLoading: isAddingCreator
   } = useScaffoldContractWrite({
     contractName: "YourContract",
     functionName: "addCreatorFlow",
-    args: [creator, cap],
+    args: [creator, cap && cap !== undefined ? BigNumber.from(parseEther(cap)) : BigNumber.from(0)],
   });
-    
-  // Write hook for adding batch creators.  
-  const { 
+
+  // Write hook for adding batch creators.
+  const {
     writeAsync: addBatch,
     // isLoading: isAddingBatchCreators
   } = useScaffoldContractWrite({
     contractName: "YourContract",
     functionName: "addBatch",
-    args: [batchCreators, batchCaps],
+    args: [
+      batchCreators,
+      batchCaps?.map(value => (value && value !== undefined ? BigNumber.from(parseEther(value)) : BigNumber.from(0))),
+    ],
   });
 
-  // Write hook for adding batch creators.  
-  const { writeAsync: updateCreator,
+  // Write hook for adding batch creators.
+  const {
+    writeAsync: updateCreator,
     // isLoading: isUpdatingCreator
   } = useScaffoldContractWrite({
     contractName: "YourContract",
     functionName: "updateCreatorFlowCapCycle",
-    args: [creator, cap],
+    args: [creator, cap && cap !== undefined ? BigNumber.from(parseEther(cap)) : BigNumber.from(0)],
   });
-    
-  // Write hook for removing a creator.  
+
+  // Write hook for removing a creator.
   const {
     writeAsync: removeCreator,
     // isLoading: isRemovingCreator
@@ -73,79 +73,83 @@ const Admin = () => {
     value: fundingValue.toString(),
   });
 
+  // use debounce for add,batchAdd and update
+  const debouncedAddCreator = debounce(async () => {
+    if (!creator || !cap) {
+      setErrorMessage("Please enter all the required fields.");
+      return;
+    }
 
-   
+    await addCreator();
+
+    setSuccessMessage("Creator added successfully.");
+    setCreator("");
+    setCap("0");
+  }, 500);
+
+  const debouncedAddBatch = debounce(async () => {
+    if (batchCreators?.length === 0 || batchCreators?.length !== batchCaps?.length) {
+      setErrorMessage("Please enter valid batch data.");
+      return;
+    }
+
+    await addBatch();
+
+    setSuccessMessage("Creators added successfully.");
+    setBatchCreators([]);
+    setBatchCaps([]);
+  }, 500);
+
+  const debouncedUpdateCreator = debounce(async () => {
+    if (!creator) {
+      setErrorMessage("Please enter at least one creator address.");
+      return;
+    }
+
+    await updateCreator();
+
+    setSuccessMessage("Creators updated successfully.");
+    setCreator("");
+  }, 500);
+
   const handleModalAction = async () => {
     try {
       setLoading(true);
       setSuccessMessage("");
       setErrorMessage("");
-      
-      if (modalAction === "add") {
-        if (!creator || !cap) {
-          setErrorMessage("Please enter all the required fields.");
-          return;
-        }
-      
-        await addCreator();
-      
-        setSuccessMessage("Creator added successfully.");
-        setCreator("");
-        setCap(undefined);
-      } else if (modalAction === "fund") {
 
+      if (modalAction === "add") {
+        debouncedAddCreator();
+      } else if (modalAction === "batchAdd") {
+        debouncedAddBatch();
+      } else if (modalAction === "update") {
+        debouncedUpdateCreator();
+      } else if (modalAction === "fund") {
         if (!fundingValue) {
           setErrorMessage("The amount is not valid.");
           return;
         }
 
         try {
-        
           await fundContract();
-        
+
           setSuccessMessage("Contract funded successfully.");
           setFundingValue(0);
         } catch (error) {
           setErrorMessage("Failed to fund contract. Please try again.");
           console.error(error);
         }
-
       } else if (modalAction === "remove") {
         if (!creator) {
           setErrorMessage("Please enter the creator address.");
           return;
         }
-      
+
         await removeCreator();
-      
+
         setSuccessMessage("Creator removed successfully.");
         setCreator("");
-      } else if (modalAction === "batchAdd") {
-        if (
-          batchCreators.length === 0 ||
-          batchCreators.length !== batchCaps?.length 
-        ) {
-          setErrorMessage("Please enter valid batch data.");
-          return;
-        }
-      
-        await addBatch();
-      
-        setSuccessMessage("Creators added successfully.");
-        setBatchCreators([]);
-        setBatchCaps([]);
-      } else if (modalAction === "update") {
-        if (!creator) {
-          setErrorMessage("Please enter at least one creator address.");
-          return;
-        }
-      
-        await updateCreator();
-      
-        setSuccessMessage("Creators updated successfully.");
-        setCreator("");
       }
-      
       // setModalAction("");
     } catch (error) {
       setErrorMessage("Failed to perform the action. Please try again.");
@@ -154,41 +158,27 @@ const Admin = () => {
       setLoading(false);
     }
   };
-      
-    
+
   const handleAddInput = () => {
-    setBatchCreators((prev) => [...prev, ""]);
-    setBatchCaps((prev) => [...prev, BigNumber.from(0)]);
+    setBatchCreators((prev: string[] | undefined) => [...(prev ?? []), ""]);
+    setBatchCaps((prev: string[] | undefined) => [...(prev ?? []), ""]);
   };
 
-  const handleBatchCapChange = (index: number, value: string) => {
-    const parsedValue = parseFloat(value);
-    if (isNaN(parsedValue)) {
-      handleInputChange(index, undefined, setBatchCaps);
-    } else {
-      const weiValue = parseEther(parsedValue.toString());
-      handleInputChange(index, weiValue.toString(), setBatchCaps);
-    }
-  };
-  
-    
-  const handleInputChange = (index: number, value: string | undefined, setState: any) => {
+  const handleInputChange = (index: number, value: number | string | undefined, setState: any) => {
     setState((prevState: any) => {
       const updatedState = [...prevState];
       updatedState[index] = value !== undefined ? value : "";
       return updatedState;
     });
   };
-  
 
-  
   const handleModalActionSelect = (action: string) => {
     setModalAction(action);
   };
 
   const reset = () => {
     setCreator("");
-    setCap(undefined);
+    setCap("");
     setBatchCreators([]);
     setBatchCaps([]);
     setLoading(false);
@@ -197,13 +187,15 @@ const Admin = () => {
     setFundingValue(0);
   };
 
-      
+  // to avoid linting issues untill loading and transaction states is implemented.
+  console.log(loading, successMessage, errorMessage);
+
   return (
     <div className="flex justify-center items-center">
       <label htmlFor="my-modal" className="btn rounded-lg">
         Manage
       </label>
-      
+
       <input type="checkbox" id="my-modal" className="modal-toggle" />
       <div className="modal">
         <div className="modal-box">
@@ -214,7 +206,7 @@ const Admin = () => {
                 <select
                   name="modalAction"
                   value={modalAction}
-                  onChange={(e) => handleModalActionSelect(e.target.value)}
+                  onChange={e => handleModalActionSelect(e.target.value)}
                   className="select select-accent w-full max-w-xs"
                 >
                   <option value="add">Add Creator</option>
@@ -246,52 +238,43 @@ const Admin = () => {
               <label htmlFor="cap" className="block mt-4">
                 Cap:
               </label>
-              <input
-                type="number"
-                id="cap"
-                className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 border border-2 border-solid border-base-300 focus:text-gray-400 px-4 w-full font-medium placeholder:text-accent/50 text-gray-700 dark:text-gray-200"
-                // value={cap?.toString()}
-                onChange={(e) => {
-                  const value = e.target.value.trim();
-                  const weiValue = parseFloat(value) * 1e18; // Convert value to wei
-                  if (isNaN(weiValue)) {
-                    setCap(undefined);
-                  } else {
-                    setCap(BigNumber.from(weiValue.toString()));
-                  }
-                }}
-              />
+              <EtherInput value={cap.toString()} onChange={value => setCap(value)} placeholder="Enter cap amount" />
             </div>
           )}
           {modalAction === "batchAdd" && (
             <div>
-              {batchCreators.map((creator, index) => (
-                <div key={index}>
-                  <label htmlFor={`batch-creators-${index}`} className="block mt-4">
-                    Creator Address {index + 1}:
-                  </label>
-                  <AddressInput
-                    name={`batch-creators-${index}`}
-                    value={creator}
-                    onChange={value => handleInputChange(index, value, setBatchCreators)}
-                  />
+              {batchCreators &&
+                batchCreators.map((creator, index) => (
+                  <div key={index}>
+                    <label htmlFor={`batch-creators-${index}`} className="block mt-4">
+                      Creator Address {index + 1}:
+                    </label>
+                    <AddressInput
+                      name={`batch-creators-${index}`}
+                      value={creator}
+                      onChange={value => handleInputChange(index, value, setBatchCreators)}
+                    />
 
-                  <label htmlFor={`batch-caps-${index}`} className="block mt-4">
-                    Cap {index + 1}:
-                  </label>
-                  <input
-                    type="text"
-                    id={`batch-caps-${index}`}
-                    className="input focus:outline-none focus:bg-transparent focus:text-gray-400 h-10 min-h-[2.2rem] px-4 border-2 border-solid border-base-300 w-full font-medium placeholder:text-accent/50 text-gray-400"
-                    // value={batchCaps[index] !== undefined ? batchCaps[index].divideBy(1e18).toString() : ""}
-                    onChange={(e) => handleBatchCapChange(index, e.target.value)}
-                  />
-
-                </div>
-              ))}
+                    <label htmlFor={`batch-caps-${index}`} className="block mt-4">
+                      Cap {index + 1}:
+                    </label>
+                    <EtherInput
+                      value={batchCaps ? batchCaps[index].toString() : ""}
+                      onChange={value => handleInputChange(index, value, setBatchCaps)}
+                      placeholder="Enter stream cap"
+                    />
+                  </div>
+                ))}
 
               <button className="flex w-full items-center flex-row justify-end" onClick={handleAddInput}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 Add
@@ -303,10 +286,7 @@ const Admin = () => {
               <label htmlFor="creator" className="block mt-4">
                 Funding amount:
               </label>
-              <EtherInput
-                value={fundingValue.toString()}
-                onChange={(e) => setFundingValue(Number(e))}
-              />
+              <EtherInput value={fundingValue.toString()} onChange={e => setFundingValue(Number(e))} />
             </div>
           )}
           {modalAction !== "update" && modalAction !== "batchAdd" && modalAction !== "fund" && (
@@ -320,20 +300,7 @@ const Admin = () => {
                   <label htmlFor="cap" className="block mt-4">
                     Cap:
                   </label>
-                  <input
-                    type="number"
-                    id="cap"
-                    className="input input-ghost focus:outline-none focus:bg-transparent focus:text-gray-400 border border-2 border-solid border-base-300 focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 w-full font-medium placeholder:text-accent/50 text-gray-700 dark:text-gray-200"
-                    // value={cap?.toString()}
-                    onChange={(e) => {
-                      const value = e.target.value.trim();
-                      const weiValue = parseFloat(value) * 1e18; // Convert value to wei
-                      if (isNaN(weiValue)) {
-                        setCap(undefined);
-                      } else {
-                        setCap(BigNumber.from(weiValue.toString()));
-                      }
-                    }} />
+                  <EtherInput value={cap.toString()} onChange={value => setCap(value)} placeholder="Enter stream cap" />
                 </>
               )}
             </div>
@@ -342,7 +309,7 @@ const Admin = () => {
             <button className="btn rounded-lg" onClick={reset}>
               reset
             </button>
-            {modalAction &&
+            {modalAction && (
               <button className="btn btn-primary rounded-lg" onClick={handleModalAction}>
                 {modalAction === "add" && "Add"}
                 {modalAction === "batchAdd" && "Add Batch"}
@@ -350,13 +317,12 @@ const Admin = () => {
                 {modalAction === "remove" && "Remove"}
                 {modalAction === "fund" && "Fund"}
               </button>
-            }
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
-      
-    
+
 export default Admin;
