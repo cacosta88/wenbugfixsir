@@ -86,7 +86,9 @@ const ContractEvents = () => {
           {fundsReceivedEvents.map((event, index) => (
             <div key={index}>
               <div className="flex flex-row items-center">
-                <div className="pr-4">Ξ {formatEther(event.args[1])}</div>
+                <div className="pr-4">
+                  Ξ <Price value={Number(formatEther(event.args[1]))} />
+                </div>
                 <p className="pr-4">from</p>
                 <Address address={event.args[0]} />
               </div>
@@ -101,7 +103,9 @@ const ContractEvents = () => {
             <div key={index}>
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
-                <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
+                <div className="pl-4">
+                  Ξ <Price value={Number(formatEther(event.args[1]))} />
+                </div>
                 <div className="pl-4">{event.args[2]}</div>
               </div>
             </div>
@@ -115,7 +119,9 @@ const ContractEvents = () => {
             <div key={index}>
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
-                <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
+                <div className="pl-4">
+                  Ξ <Price value={Number(formatEther(event.args[1]))} />
+                </div>
                 <div className="pl-4">30 days</div>
               </div>
             </div>
@@ -129,7 +135,9 @@ const ContractEvents = () => {
             <div key={index}>
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
-                <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
+                <div className="pl-4">
+                  Ξ <Price value={Number(formatEther(event.args[1]))} />
+                </div>
                 <div className="pl-4">30 days</div>
               </div>
             </div>
@@ -155,12 +163,8 @@ const ContractEvents = () => {
             <div key={index}>
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
-                {(() => {
-                  console.log(["SHITZU", formatEther(event.args[1])]);
-                  return true;
-                })() && <>{event.args[1]}</>}
                 <div className="pl-4">
-                  Ξ <Price value={Number(event.args[1])} />
+                  Ξ <Price value={Number(formatEther(event.args[1]))} />
                 </div>
               </div>
             </div>
