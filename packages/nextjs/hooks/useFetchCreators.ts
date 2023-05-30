@@ -36,12 +36,8 @@ export const useFetchCreators = () => {
 
   useEffect(() => {
     if (creatorRemoved) {
-      console.log(creatorRemoved);
       const removedCreators = creatorRemoved.map(creator => creator.args[0]);
-      console.log(removedCreators);
-      console.log(creators);
       setCreators(prev => prev.filter(creator => !removedCreators.includes(creator)));
-      console.log(creators);
     }
   }, [creatorRemoved, creators]);
 

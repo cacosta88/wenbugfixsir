@@ -14,13 +14,13 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
   const percentage = cap > 0 ? (Number(unlockedAmount) / cap) * 100 : 0;
 
   return (
-    <div className="flex items-center justify-between tracking-widest w-full p-4 rounded-lg bg-base-200 flex-row space-x-6 space-y-6">
-      <div className="uppercase">
+    <div className="flex items-center lg:justify-between justify-evenly w-full p-4 flex-row lg:space-x-6 space-x-2 space-y-6">
+      <div className="pt-4">
         <Address address={creatorAddress} />
       </div>
-      <div className="flex flex-col w-fit lg:w-[250px]">
+      <div className="flex flex-col p-2 lg:p-5 overflow-hidden w-fit">
         <div className="flex flex-row">
-          <div className="flex items-center w-full">
+          <div className="flex items-center">
             <div className="px-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                className="w-5 h-5"
+                className="w-3 h-3 lg:w-5 lg:h-5"
               >
                 <path
                   stroke-linecap="round"
@@ -37,9 +37,9 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
                 />
               </svg>
             </div>
-            <div className="flex-grow-1">Ξ {cap}</div>
+            <div className="text-sm tracking-tighter lg:text-lg whitespace-nowrap">Ξ {cap}</div>
           </div>
-          <div className="flex items-center w-full">
+          <div className="flex flex-row items-center text-left w-full">
             <div className="px-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,7 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                className="w-5 h-5"
+                className="w-3 h-3 lg:w-5 lg:h-5"
               >
                 <path
                   stroke-linecap="round"
@@ -56,7 +56,7 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
                 />
               </svg>
             </div>
-            <div className="flex-grow-1">{Number(unlockedAmount).toFixed(4)}</div>
+            <div className="text-sm tracking-tighter lg:text-lg">{Number(unlockedAmount).toFixed(4)}</div>
           </div>
         </div>
         <div className="w-full">
@@ -64,13 +64,9 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
         </div>
         <div className="flex flex-row">
           <div className="flex flex-row items-center">
-            <div className="font-semibold px-3">Last:</div>
-            <div className="flex-grow-1">{getTimeAgo(last * 1000)}</div>
+            <div className="font-semibold tracking-tighter text-sm lg:text-lg px-3">Last:</div>
+            <div className="text-sm tracking-tighter lg:text-lg">{getTimeAgo(last * 1000)}</div>
           </div>
-          {/* <div className="flex flex-row items-center">
-              <div className="">Cycle:</div>
-              <div className="flex-grow-1">{cycle} days</div>
-            </div> */}
         </div>
       </div>
     </div>

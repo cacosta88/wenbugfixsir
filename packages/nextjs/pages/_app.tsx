@@ -15,6 +15,7 @@ import { wagmiClient } from "~~/services/web3/wagmiClient";
 import { appChains } from "~~/services/web3/wagmiConnectors";
 import "~~/styles/globals.css";
 
+
 const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
   const price = useNativeCurrencyPrice();
   const setNativeCurrencyPrice = useGlobalState(state => state.setNativeCurrencyPrice);
@@ -40,7 +41,7 @@ const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
         avatar={BlockieAvatar}
         theme={isDarkTheme ? darkTheme() : lightTheme()}
       >
-        <div className="flex flex-col min-h-screen">
+        <div className="flex gotham-font flex-col min-h-screen">
           <Header />
           <main className="relative flex flex-col flex-1">
             <Component {...pageProps} />

@@ -78,7 +78,7 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
         <span className="ml-1.5 text-lg font-normal">{displayAddress}</span>
       ) : (
         <a
-          className="ml-1.5 text-lg font-normal"
+          className="ml-1.5 text-sm lg:text-lg font-normal"
           target="_blank"
           href={blockExplorerAddressLink}
           rel="noopener noreferrer"
@@ -88,7 +88,7 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
       )}
       {addressCopied ? (
         <CheckCircleIcon
-          className="ml-1.5 text-xl font-normal text-sky-600 h-5 w-5 cursor-pointer"
+          className="ml-1.5 text-xl font-normal text-yellow-600 h-5 w-5 cursor-pointer"
           aria-hidden="true"
         />
       ) : (
@@ -102,7 +102,7 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
           }}
         >
           <DocumentDuplicateIcon
-            className="ml-1.5 text-xl font-normal text-sky-600 h-5 w-5 cursor-pointer"
+            className="ml-1.5 text-xl font-normal primary-content h-5 w-5 cursor-pointer"
             aria-hidden="true"
           />
         </CopyToClipboard>
