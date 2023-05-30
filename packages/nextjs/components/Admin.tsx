@@ -192,7 +192,7 @@ const Admin = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <label htmlFor="my-modal" className="btn rounded-lg">
+      <label htmlFor="my-modal" className="btn btn-primary rounded-lg">
         Manage
       </label>
 

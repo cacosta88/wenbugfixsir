@@ -1,30 +1,43 @@
+import React, { useEffect, useState } from "react";
+import { CreatorData } from ".";
 import { BigNumber } from "ethers";
 import { parseUnits } from "ethers/lib/utils.js";
-import { ChangeEventHandler, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { CreatorInfoDisplay } from "~~/components/CreatorInfoDisplay";
 import { EtherInput } from "~~/components/scaffold-eth";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { useCreatorUnlockedAmount } from "~~/hooks/useCreatorUnlockedAmount";
 import { useFetchCreators } from "~~/hooks/useFetchCreators";
+import { useSetCreator } from "~~/hooks/useSetCreator";
 
-const Creator = () => {
+const Creator: React.FC<undefined> = () => {
   const { address, isConnected } = useAccount();
+  const { creators, isLoadingCreators } = useFetchCreators();
+
+  const [creatorData, setCreatorData] = useState<CreatorData>({});
+
   // State to hold flow withdrawal args.
   const [amount, setAmount] = useState<BigNumber | undefined>(undefined);
   const [reason, setReason] = useState<string>("");
   const [unlocked, setUnlocked] = useState<BigNumber | undefined>(undefined);
 
-  // Get creator list.
-  const { creators, isLoadingCreators, errorReadingCreators } = useFetchCreators();
+  // Get creator data.
+  const { data: allCreatorData } = useScaffoldContractRead({
+    contractName: "YourContract",
+    functionName: "allCreatorsData",
+    args: [[address || ""]],
+  });
+
+  useSetCreator({ allCreatorsData: allCreatorData, creators: [address || ""], setCreatorsData: setCreatorData });
+
+  console.log(creatorData);
 
   // Get creator unlocked amount.
-  const { data: creatorAmt, isLoading: isLoadingCreatorAmt } = useScaffoldContractRead({
+  const { data: creatorAmt } = useScaffoldContractRead({
     contractName: "YourContract",
     functionName: "availableCreatorAmount",
     args: [address],
   });
 
-    
   useEffect(() => {
     if (creatorAmt) {
       setUnlocked(creatorAmt);
@@ -48,12 +61,10 @@ const Creator = () => {
     }
   };
 
-
-  const handleAmountChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    const parsedAmount = e.target.value !== "" ? parseUnits(e.target.value, 18) : undefined;
+  const handleAmountChange = (value: string) => {
+    const parsedAmount = value !== "" ? parseUnits(value, 18) : undefined;
     setAmount(parsedAmount);
   };
-
 
   const handleReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setReason(e.target.value);
@@ -63,39 +74,58 @@ const Creator = () => {
     return <div className="text-center m-auto">Connect to continue.</div>;
   }
 
-  if (address && !creators.includes(address)) {
+  if (!address && (!creators || !creators.find(creator => address == creator))) {
     return <div className="text-center m-auto">You are not worthy to view this page.</div>;
   }
 
   return (
-    <div className="w-full flex justify-center p-6 ">
-      {/* The button to open modal */}
-      <label htmlFor="my-modal" className="btn btn-primary rounded-lg">
-        Withdraw
-      </label>
-
-      <input type="checkbox" id="my-modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box relative space-y-4">
-          <label htmlFor="my-modal" className="btn btn-sm btn-circle absolute right-2 top-2">
-            ✕
+    <div className="w-full flex flex-col items-center justify-center p-6">
+      {isLoadingCreators ? (
+        <div className="text-center m-auto">Loading creator information...</div>
+      ) : (
+        <>
+          <div className="flex flex-col p-5 text-center items-center max-w-full">
+            <div className="w-full my-20">
+              <h1 className="text-center font-bold tracking-widest uppercase">Your Stream</h1>
+              {Object.entries(creatorData).map(([creatorAddress, creatorData]) => (
+                <CreatorInfoDisplay key={creatorAddress} creatorData={creatorData} creatorAddress={creatorAddress} />
+              ))}
+            </div>
+          </div>
+          <label htmlFor="my-modal" className="btn btn-primary rounded-lg">
+            Withdraw
           </label>
-          <h3 className="text-lg font-bold">Withdraw</h3>
-          <div>
-            <label htmlFor="amount">Amount:</label>
-            <input className="w-full py-2 input" onChange={handleAmountChange} />
+
+          <input type="checkbox" id="my-modal" className="modal-toggle" />
+          <div className="modal">
+            <div className="modal-box relative space-y-4">
+              <label htmlFor="my-modal" className="btn btn-sm btn-circle absolute right-2 top-2">
+                ✕
+              </label>
+              <h3 className="text-lg font-bold">Withdraw</h3>
+              <div>
+                <label htmlFor="reason py-2">Reason:</label>
+                <input
+                  type="text"
+                  id="reason"
+                  className="w-full py-2 input"
+                  value={reason}
+                  onChange={handleReasonChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="amount">Amount:</label>
+                <EtherInput value={amount?.toString() || ""} onChange={handleAmountChange} />
+              </div>
+              <div className="modal-action">
+                <button onClick={handleWithdraw} className="btn rounded-lg" disabled={isWithdrawing}>
+                  Withdraw
+                </button>
+              </div>
+            </div>
           </div>
-          <div>
-            <label htmlFor="reason py-2">Reason:</label>
-            <input type="text" id="reason" className="w-full py-2 input" value={reason} onChange={handleReasonChange} />
-          </div>
-          <div className="modal-action">
-            <button onClick={handleWithdraw} className="btn rounded-lg" disabled={isWithdrawing}>
-              Withdraw
-            </button>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

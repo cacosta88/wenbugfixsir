@@ -38,10 +38,7 @@ export const useFetchCreators = () => {
     if (creatorRemoved && creatorRemoved.length !== 0) {
       console.log(creatorRemoved);
       const removedCreators = creatorRemoved.map(creator => creator.args[0]);
-      console.log(removedCreators);
-      console.log(creators);
       setCreators(prev => prev.filter(creator => !removedCreators.includes(creator)));
-      console.log(creators);
     }
   }, [creatorRemoved, creators]);
 

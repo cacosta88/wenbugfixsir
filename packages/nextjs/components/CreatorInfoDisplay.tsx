@@ -17,14 +17,14 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
   const percentage = cap > 0 ? (Number(unlockedAmount) / cap) * 100 : 0;
 
   return (
-    <div className="flex items-center justify-between tracking-widest w-full p-4 rounded-lg bg-base-200 flex-row space-x-6 space-y-6">
-      <div className="uppercase">
+    <div className="flex items-center lg:justify-between justify-evenly w-full p-4 flex-row lg:space-x-6 space-x-2 space-y-6">
+      <div className="flex-auto w-[50%]">
         <Address address={creatorAddress} />
       </div>
-      <div className="flex flex-col w-fit lg:w-[250px]">
+      <div className="flex-auto w-[50%]">
         <div className="flex flex-row">
           <div className="flex items-center w-full">
-            <div className="px-1">
+            <div className="pb-2 pr-2">
               <LockIcon />
             </div>
             <div className="flex-grow-2">
@@ -32,7 +32,7 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
             </div>
           </div>
           <div className="flex items-center w-full">
-            <div className="px-1">
+            <div className="pb-2 pr-2">
               <UnlockIcon />
             </div>
             <div className="flex-grow-1">
@@ -40,18 +40,14 @@ export const CreatorInfoDisplay: React.FC<{ creatorData: CreatorInfo; creatorAdd
             </div>
           </div>
         </div>
-        <div className="w-full">
+        <div className="flex flex-row">
           <progress className="progress progress-primary" value={percentage} max="100"></progress>
         </div>
         <div className="flex flex-row">
           <div className="flex flex-row items-center">
-            <div className="font-semibold px-3">Last:</div>
-            <div className="flex-grow-1">{getTimeAgo(last * 1000)}</div>
+            <div className="font-semibold tracking-tighter text-sm lg:text-lg px-3">Last:</div>
+            <div className="text-sm tracking-tighter lg:text-lg">{getTimeAgo(last * 1000)}</div>
           </div>
-          {/* <div className="flex flex-row items-center">
-              <div className="">Cycle:</div>
-              <div className="flex-grow-1">{cycle} days</div>
-            </div> */}
         </div>
       </div>
     </div>
