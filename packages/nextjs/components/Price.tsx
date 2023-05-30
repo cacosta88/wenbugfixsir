@@ -9,9 +9,10 @@ export const Price: React.FC<TPriceProps> = ({ value }: TPriceProps) => {
   const [dollarMode, setDollarMode] = useState(true);
   const price = useGlobalState(state => state.nativeCurrencyPrice);
 
-  let displayBalance = value.toFixed(4);
+  const isValueNaN = isNaN(value);
+  let displayBalance = isValueNaN ? NaN : value.toFixed(4);
 
-  if (dollarMode) {
+  if (!isValueNaN && dollarMode && price > 0) {
     displayBalance = "$" + (value * price).toFixed(2);
   }
 
@@ -21,7 +22,9 @@ export const Price: React.FC<TPriceProps> = ({ value }: TPriceProps) => {
         cursor: "pointer",
       }}
       onClick={() => {
-        setDollarMode(!dollarMode);
+        if (price > 0) {
+          setDollarMode(!dollarMode);
+        }
       }}
     >
       {displayBalance}

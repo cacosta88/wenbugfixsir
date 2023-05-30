@@ -35,7 +35,7 @@ export const useFetchCreators = () => {
   });
 
   useEffect(() => {
-    if (creatorRemoved) {
+    if (creatorRemoved && creatorRemoved.length !== 0) {
       console.log(creatorRemoved);
       const removedCreators = creatorRemoved.map(creator => creator.args[0]);
       console.log(removedCreators);
@@ -58,7 +58,7 @@ export const useFetchCreators = () => {
   });
 
   useEffect(() => {
-    if (creatorUpdated) {
+    if (creatorUpdated && creatorUpdated.length !== 0) {
       creatorUpdated.forEach(creator => {
         const updatedCreator = creator.args[0];
         setCreators(prev => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Price } from "./Price";
 import { Address } from "./scaffold-eth";
 import { formatEther } from "ethers/lib/utils.js";
 import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
@@ -154,7 +155,13 @@ const ContractEvents = () => {
             <div key={index}>
               <div className="flex flex-row items-center">
                 <Address address={event.args[0]} />
-                <div className="pl-4">Ξ {formatEther(event.args[1])}</div>
+                {(() => {
+                  console.log(["SHITZU", formatEther(event.args[1])]);
+                  return true;
+                })() && <>{event.args[1]}</>}
+                <div className="pl-4">
+                  Ξ <Price value={Number(event.args[1])} />
+                </div>
               </div>
             </div>
           ))}
