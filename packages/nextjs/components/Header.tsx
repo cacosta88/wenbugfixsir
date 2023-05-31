@@ -7,6 +7,7 @@ import { SettingsIcon } from "./SettingsIcon";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
+import { useIsAdmin } from "~~/hooks/useIsAdmin";
 import { useIsCreator } from "~~/hooks/useIsCreator";
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
@@ -32,6 +33,7 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
 export const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { isCreator } = useIsCreator();
+  const { isAdmin } = useIsAdmin();
   const burgerMenuRef = useRef<HTMLDivElement>(null);
   useOutsideClick(
     burgerMenuRef,
@@ -51,18 +53,22 @@ export const Header = () => {
           </NavLink>
         </li>
       )}
-      <li>
-        <NavLink href="/admin">
-          <SettingsIcon />
-          Admin
-        </NavLink>
-      </li>
-      <li>
-        <NavLink href="/debug">
-          <BugAntIcon className="h-4 w-4" />
-          Debug Contracts
-        </NavLink>
-      </li>
+      {isAdmin && (
+        <>
+          <li>
+            <NavLink href="/admin">
+              <SettingsIcon />
+              Admin
+            </NavLink>
+          </li>
+          <li>
+            <NavLink href="/debug">
+              <BugAntIcon className="h-4 w-4" />
+              Debug Contracts
+            </NavLink>
+          </li>
+        </>
+      )}
     </>
   );
 
