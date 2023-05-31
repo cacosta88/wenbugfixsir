@@ -74,7 +74,7 @@ const Creator: React.FC<undefined> = () => {
     return <div className="text-center m-auto">Connect to continue.</div>;
   }
 
-  if (!address && (!creators || !creators.find(creator => address == creator))) {
+  if (!address || !creators || creators.find(creator => address === creator) === undefined) {
     return <div className="text-center m-auto">You are not worthy to view this page.</div>;
   }
 
