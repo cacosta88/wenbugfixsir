@@ -6,12 +6,12 @@ import { useAccount } from "wagmi";
 import { CreatorInfoDisplay } from "~~/components/CreatorInfoDisplay";
 import { EtherInput } from "~~/components/scaffold-eth";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { useFetchCreators } from "~~/hooks/useFetchCreators";
+import { useIsCreator } from "~~/hooks/useIsCreator";
 import { useSetCreator } from "~~/hooks/useSetCreator";
 
 const Creator: React.FC<undefined> = () => {
   const { address, isConnected } = useAccount();
-  const { creators, isLoadingCreators } = useFetchCreators();
+  const { isCreator, isLoading: isLoadingCreators } = useIsCreator();
 
   const [creatorData, setCreatorData] = useState<CreatorData>({});
 
@@ -28,8 +28,6 @@ const Creator: React.FC<undefined> = () => {
   });
 
   useSetCreator({ allCreatorsData: allCreatorData, creators: [address || ""], setCreatorsData: setCreatorData });
-
-  console.log(creatorData);
 
   // Get creator unlocked amount.
   const { data: creatorAmt } = useScaffoldContractRead({
@@ -74,7 +72,7 @@ const Creator: React.FC<undefined> = () => {
     return <div className="text-center m-auto">Connect to continue.</div>;
   }
 
-  if (!address || !creators || creators.find(creator => address === creator) === undefined) {
+  if (!isCreator) {
     return <div className="text-center m-auto">You are not worthy to view this page.</div>;
   }
 
