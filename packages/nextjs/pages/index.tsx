@@ -61,7 +61,7 @@ const Home: NextPage = () => {
         </div>
         <div className="container mx-auto">
           <div className="w-full items-center space-y-5  pt-7 flex flex-col justify-center">
-            <p className="font-bold mb-2 tracking-widest uppercase text-primary-content">Contract Balance</p>
+            <p className="font-bold mb-2 tracking-widest uppercase text-primary-content">Squad&apos;s Fund</p>
             <Address address={streamContract.data?.address} />
             <Balance className="text-3xl" address={streamContract.data?.address} />
           </div>
