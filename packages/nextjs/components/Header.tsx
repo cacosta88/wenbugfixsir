@@ -73,8 +73,8 @@ export const Header = () => {
   );
 
   return (
-    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary">
-      <div className="navbar-start w-auto lg:w-1/2">
+    <div className="sticky top-[2rem] place-self-center navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-sm drop-shadow-[0_25px_25px_hsl(var(--s))] w-3/4 rounded-full">
+      <div className="navbar-start w-[75%] lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
           <button
             className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
@@ -101,7 +101,7 @@ export const Header = () => {
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.png" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold leading-tight">Squad</span>
+            <span className="font-bold leading-tight">LaunchPod&#8482;</span>
             <span className="text-xs">Public Good</span>
           </div>
         </Link>
