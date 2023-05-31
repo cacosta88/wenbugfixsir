@@ -26,8 +26,8 @@ error AccessDenied();
 contract YourContract is AccessControl, ReentrancyGuard {
   // Fixed cycle and max creators
   uint256 immutable CYCLE = 30 days;
-  // uint256 immutable MAXCREATORS = 25;
-  uint256 immutable MAXCREATORS = 2; // reduced for unit tests
+  uint256 immutable MAXCREATORS = 25;
+  //uint256 immutable MAXCREATORS = 2; // reduced for unit tests
 
   // Emergency mode variable
   bool public stopped = false;
