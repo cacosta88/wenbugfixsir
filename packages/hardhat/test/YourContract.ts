@@ -168,7 +168,7 @@ describe("Test file for YourContract.sol", () => {
 
 
   describe("Add creator flow", () => {
-    it("Should add creator flow and emit corresponding event", async () => {
+    it("Should correctly add creator flow and emit corresponding event", async () => {
       await expect(contract.addCreatorFlow(user_2.address, CAP))
         .to.emit(contract, "CreatorAdded")
         .withArgs(user_2.address, CAP, 30 * (60 * 60 * 24));
@@ -198,7 +198,7 @@ describe("Test file for YourContract.sol", () => {
         "CapCannotBeZero",
       );
     });
-    it("Should revert if creator already exists", async () => {
+    it("Should correctly revert if creator already exists", async () => {
       await contract.addCreatorFlow(user_2.address, CAP);
       await expect(contract.addCreatorFlow(user_2.address, CAP)).to.be.revertedWithCustomError(
         contract,
@@ -235,13 +235,13 @@ describe("all Creator Data", () => {
 describe("Remove Creator", () => {
     beforeEach(addCreatorFlows);
 
-    it("Should remove a creator's flow successfully", async () => {
+    it("Should correctly remove a creator's flow successfully", async () => {
       await contract.removeCreatorFlow(user_2.address);
       const creator = await contract.flowingCreators(user_2.address);
       expect(creator[0]).to.equal(0);
     });
 
-    it("Should emit an event when a creator's flow is removed", async () => {
+    it("Should correctly emit an event when a creator's flow is removed", async () => {
       await expect(contract.removeCreatorFlow(user_2.address))
         .to.emit(contract, "CreatorRemoved")
         .withArgs(user_2.address);
@@ -257,14 +257,14 @@ describe("Update creator Cap", () => {
       expect(creator[0]).to.equal(CAP_UPDATE);
     });
 
-    it("Should emit an event when a creator's flow cap is updated", async () => {
+    it("Should correctly emit an event when a creator's flow cap is updated", async () => {
       await expect(contract.updateCreatorFlowCapCycle(user_2.address, CAP_UPDATE))
         .to.emit(contract, "CreatorUpdated")
         .withArgs(user_2.address, CAP_UPDATE, 2592000);
     });
 
 
-    it("Should revert when a new cap is zero", async () => {
+    it("Should correctly revert when a new cap is zero", async () => {
       await expect(contract.updateCreatorFlowCapCycle(user_2.address, 0)).to.be.revertedWithCustomError(contract,"CapCannotBeZero");
     });
 });
